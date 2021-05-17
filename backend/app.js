@@ -1,5 +1,4 @@
 const express = require("express");
-const cors = require("cors");
 const app = express();
 
 const serial = require("./util/serial");
@@ -20,8 +19,7 @@ function init() {
     });
 }
 
-app.options('*', cors())
-
+app.use(express.json()); //Used to parse JSON bodies
 app.use("/api/movement", movementApi);
 
 init();
@@ -45,4 +43,4 @@ process.on("SIGUSR1", exitHandler.bind(null, { exit: true }));
 process.on("SIGUSR2", exitHandler.bind(null, { exit: true }));
 
 //catches uncaught exceptions
-process.on("uncaughtException", exitHandler.bind(null, { exit: true }));
+// process.on("uncaughtException", exitHandler.bind(null, { exit: true }));

@@ -6,16 +6,27 @@ import styled from "styled-components";
 import SliderVis from "../components/slider-visual.js";
 import Header from "../components/header";
 import PositioningCard from "../components/positioning-card";
+import Button from "../components/button";
+import TravelHomeButton from "../components/buttons/home";
+import UnlockMotorsButton from "../components/buttons/unlock";
+import AddKeyframeButton from "../components/buttons/add-keyframe";
 
 export default function Home() {
   return (
     <PageContainer>
       <Header />
       <SliderVis />
-      <PositioningContainer>
+      <Row>
         <PositioningCard isMove={true} />
         <PositioningCard isMove={false} />
-      </PositioningContainer>
+      </Row>
+      <Row>
+        <UnlockMotorsButton />
+        <TravelHomeButton />
+      </Row>
+      <Row>
+        <AddKeyframeButton />
+      </Row>
     </PageContainer>
   );
 }
@@ -31,7 +42,7 @@ const PageContainer = styled.div`
   background-color: #111827;
 `;
 
-const PositioningContainer = styled.div`
+const Row = styled.div`
   display: flex;
   justify-content: space-between;
   margin: 20px;

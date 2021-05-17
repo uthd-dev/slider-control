@@ -7,7 +7,7 @@ const fetcher = (...args) => fetch(...args).then(res => res.json())
 
 export default function SliderComponent () {
     //Get stepper positions from backend
-  const { data, error } = useSWR('/api/movement/positions', fetcher)
+  const { data, error } = useSWR('/api/movement/positions/slider-position', fetcher, { refreshInterval: 1000 })
 
   if (error) return <div>failed to load</div>
   if (!data) return <div>loading...</div>

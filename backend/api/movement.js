@@ -63,23 +63,132 @@ router.get("/unlock", (req, res) => {
 });
 
 router.get("/home", (req, res) => {
-    serial.home();
-    pos.zeroMotorPositions();
-    res.status(200).json({
-      positions: {
-        motorPositions: { ...pos.motorPositions },
-        animationPositions: { ...pos.postitions },
-      },
+  serial
+    .home()
+    .then(() => {
+      res.status(200).json({
+        positions: {
+          motorPositions: { ...pos.motorPositions },
+          animationPositions: { ...pos.postitions },
+        },
+      });
+    })
+    .catch((err) => {
+      console.log(err);
     });
-  });
+});
 
-router.get("/positions", (req, res) => {
+router.get("/positions/slider-position", (req, res) => {
   res.status(200).json({
     positions: {
       motorPositions: { ...pos.motorPositions },
-      animationPositions: { ...pos.postitions },
     },
   });
-})
+});
+
+router.get("/positions/keyframes", (req, res) => {
+  res.status(200).json({
+    positions: {
+      keyframes: pos.postitions,
+    },
+  });
+});
+
+router.get("/positions/:keyframeIndex", (req, res) => {
+  //get specific keyframe
+  if (req.params.keyframeIndex) {
+    if (pos.postitions.length() - 1 >= keyframeIndex && keyframeIndex >= 0) {
+      res.status(200).json({
+        mot1: pos.postitions[req.params.keyframeIndex].mot1,
+        mot2: pos.positions[req.params.keyframeIndex].mot2,
+      });
+    } else res.status(400).end("Error Marlformed Request");
+  } else res.status(400).end("Error Malformed Request");
+});
+
+router.post("/positions/keyframes", (req, res) => {
+  console.log(req.body);
+  //Create keyframe
+  let newKeyframeIndex = pos.postitions.push(req.body) - 1;
+  res.status(200).json({
+    newKeyFrameIndex: newKeyframeIndex,
+    mot1: req.body.mot1,
+    mot2: req.body.mot2,
+  });
+  console.log(`New Keyframe added! Index: ${newKeyframeIndex}`);
+  console.log(pos.postitions);
+});
+
+router.get("/continuous-translate/:actionType", (req, res) => {
+  if (req.params.actionType) {
+    if (req.params.actionType == "press" && req.query.forward) {
+      let move = {
+        //Steps and time for interval translating
+        time: 250,
+        steps: req.query.forward == "true" ? 2500 : -2500,
+      };
+
+      //When UI button pressed
+      pos.movementStatus.translating = true;
+
+      function continuousTranslate() {
+        if (pos.movementStatus.translating == true) {
+          if (serial.validateMoveX(move.time, move.steps)) {
+            serial.stepperMoveX(move.time, move.steps);
+            setTimeout(() => {
+              continuousTranslate();
+            }, 240);
+          } else {
+            pos.movementStatus.translating = false;
+          }
+        }
+      }
+      continuousTranslate();
+      res.status(200).end("OK 200");
+    } else if (req.params.actionType == "release") {
+      //When UI button released
+      pos.movementStatus.translating = false;
+      res.status(200).end("OK 200");
+    } else {
+      res.status(400).end("Error: Malformed Request");
+    }
+  }
+});
+
+router.get("/continuous-rotate/:actionType", (req, res) => {
+  if (req.params.actionType) {
+    if (req.params.actionType == "press" && req.query.clockwise) {
+      let rotate = {
+        //Steps and time for interval translating
+        time: 250,
+        steps: req.query.clockwise == "true" ? -250 : 250,
+      };
+
+      //When UI button pressed
+      pos.movementStatus.rotating = true;
+
+      function continuousRotate() {
+        if (pos.movementStatus.rotating == true) {
+          if (serial.validateMoveA(rotate.time, rotate.steps)) {
+            serial.stepperMoveA(rotate.time, rotate.steps);
+            setTimeout(() => {
+              continuousRotate();
+            }, 240);
+          } else {
+            pos.movementStatus.rotating = false;
+          }
+        }
+      }
+      continuousRotate();
+      res.status(200).end("OK 200");
+    } else if (req.params.actionType == "release") {
+      //When UI button released
+      pos.movementStatus.rotating = false;
+      res.status(200).end("OK 200");
+    } else {
+      res.status(400).end("Error: Malformed Request");
+    }
+  }
+});
 
 module.exports = router;

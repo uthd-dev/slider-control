@@ -2,7 +2,7 @@ const SerialPort = require("serialport");
 
 let pos = require("./pos");
 
-const serialPort = "/dev/ttyACM0";
+const serialPort = "COM3";
 
 let port = new SerialPort(serialPort, { autoOpen: false }, () => {
   console.log(`Serial Port: ${serialPort}`);

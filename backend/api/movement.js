@@ -1,23 +1,40 @@
 const express = require("express");
 let router = express.Router();
 let serial = require("../util/serial");
+let validateMove = require("../util/serial/validateMove");
+let stepperMove = require("../util/serial/move");
 let pos = require("../util/pos");
 
 router.get("/translate", (req, res) => {
   if (req.query.time && req.query.steps) {
     let time = parseInt(req.query.time);
     let steps = parseInt(req.query.steps);
-    if (serial.validateMoveX(time, steps)) {
-      serial.stepperMoveX(time, steps);
-      res.status(200).json({
-        positions: {
-          motorPositions: { ...pos.motorPositions },
-          animationPositions: { ...pos.postitions },
+    validateMove(steps, steps, time)
+      .then(() => {
+        stepperMove({
+          mot1: pos.motorPositions.mot1 + steps,
+          mot2: pos.motorPositions.mot2 + steps,
         },
+          time
+        )
+          .then(() => {
+            console.log(`Sending positional response for: /api/movement/translate`);
+            res.status(200).json({
+              positions: {
+                motorPositions: { ...pos.motorPositions },
+                animationPositions: { ...pos.postitions },
+              },
+            });
+          })
+          .catch(err => {
+            console.log(err);
+            res.status(500).end(`Internal Server Error`);
+          });
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(406).end(`The requested movement is unsafe`);
       });
-    } else {
-      res.status(406).end(`The requested movement is unsafe`);
-    }
   }
 });
 
@@ -73,7 +90,7 @@ router.get("/home", (req, res) => {
         },
       });
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
     });
 });

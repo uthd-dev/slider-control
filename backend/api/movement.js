@@ -11,14 +11,20 @@ router.get("/translate", (req, res) => {
     let steps = parseInt(req.query.steps);
     validateMove(steps, steps, time)
       .then(() => {
-        stepperMove({
-          mot1: pos.motorPositions.mot1 + steps,
-          mot2: pos.motorPositions.mot2 + steps,
-        },
-          time
+        stepperMove(
+          {
+            mot1: pos.motorPositions.mot1 + steps,
+            mot2: pos.motorPositions.mot2 + steps,
+          },
+          {
+            mot1: (pos.motorPositions.mot1 + steps) / time,
+            mot2: (pos.motorPositions.mot2 + steps) / time,
+          }
         )
           .then(() => {
-            console.log(`Sending positional response for: /api/movement/translate`);
+            console.log(
+              `Sending positional response for: /api/movement/translate`
+            );
             res.status(200).json({
               positions: {
                 motorPositions: { ...pos.motorPositions },

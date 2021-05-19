@@ -3,12 +3,12 @@ var pos = require("../pos");
 var move30kSteps = require("./move30kSteps");
 var validateMove = require("./validateMove");
 
-var stepperMove = (module.exports = (finalPos, time) => {
+var stepperMove = (module.exports = (finalPos, stepsPerMS) => {
   return new Promise((resolve, reject) => {
     let stepsToMoveMot1 = finalPos.mot1 - pos.motorPositions.mot1;
     let stepsToMoveMot2 = finalPos.mot2 - pos.motorPositions.mot2;
-    let mot1StepsPerMS = stepsToMoveMot1 / time;
-    let mot2StepsPerMS = stepsToMoveMot2 / time;
+    let mot1StepsPerMS = stepsPerMS.mot1;
+    let mot2StepsPerMS = stepsPerMS.mot2;
 
     console.log(`Checking if 30k step move is required`);
 
@@ -26,7 +26,7 @@ var stepperMove = (module.exports = (finalPos, time) => {
       )
         .then(() => {
           console.log(`30k movement complete`)
-          stepperMove(finalPos, time)
+          stepperMove(finalPos, stepsPerMS)
             .then(resolve())
             .catch(err => {
               reject(err);
@@ -36,7 +36,7 @@ var stepperMove = (module.exports = (finalPos, time) => {
           reject(err);
         });
     } else {
-      smallMotMovement(stepsToMoveMot1, stepsToMoveMot2, time)
+      smallMotMovement(stepsToMoveMot1, stepsToMoveMot2, stepsPerMS)
         .then(resolve())
         .catch(err => {
           reject(err);
@@ -45,9 +45,12 @@ var stepperMove = (module.exports = (finalPos, time) => {
   });
 });
 
-function smallMotMovement(stepsToMoveMot1, stepsToMoveMot2, time) {
+function smallMotMovement(stepsToMoveMot1, stepsToMoveMot2, stepsPerMS) {
   return new Promise((resolve, reject) => {
     console.log(`Performing Small motor movement!`);
+
+    let time = Math.ropund(stepsPerMS.mot1 * stepsToMoveMot1);
+
     validateMove(stepsToMoveMot1, stepsToMoveMot2, time)
       .then(() => {
         console.log(`Attempting: sm,${time},${stepsToMoveMot1},${-stepsToMoveMot2}`);

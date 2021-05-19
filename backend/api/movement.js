@@ -17,8 +17,8 @@ router.get("/translate", (req, res) => {
             mot2: pos.motorPositions.mot2 + steps,
           },
           {
-            mot1: (pos.motorPositions.mot1 + steps) / time,
-            mot2: (pos.motorPositions.mot2 + steps) / time,
+            mot1: steps / time,
+            mot2: steps / time,
           }
         )
           .then(() => {

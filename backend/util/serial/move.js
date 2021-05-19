@@ -49,8 +49,8 @@ function smallMotMovement(stepsToMoveMot1, stepsToMoveMot2, stepsPerMS) {
   return new Promise((resolve, reject) => {
     console.log(`Performing Small motor movement!`);
 
-    let time = Math.ropund(stepsPerMS.mot1 * stepsToMoveMot1);
-
+    let time = Math.round(stepsToMoveMot1 / stepsPerMS.mot1 );
+    
     validateMove(stepsToMoveMot1, stepsToMoveMot2, time)
       .then(() => {
         console.log(`Attempting: sm,${time},${stepsToMoveMot1},${-stepsToMoveMot2}`);
@@ -62,6 +62,7 @@ function smallMotMovement(stepsToMoveMot1, stepsToMoveMot2, stepsPerMS) {
         }, time - 10);
       })
       .catch(err => {
+        console.log(err);
         reject(err);
       });
   });

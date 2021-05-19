@@ -1,7 +1,7 @@
-# FRONTEND UI
+# __Frontend UI__
 Written with React using NextJS (React Framework)
 
-![screenshot of frontend UI](https://github.com/uthd-dev/slider-control/blob/main/frontend/screenshots/slider.png?raw=true)
+![screenshot of frontend UI](https://github.com/uthd-dev/slider-control/blob/main/frontend/screenshots/ui.png?raw=true)
 
 
 ---

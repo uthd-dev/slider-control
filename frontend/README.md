@@ -1,3 +1,14 @@
+# FRONTEND UI
+Written with React using NextJS (React Framework)
+
+![screenshot of frontend UI](https://github.com/uthd-dev/slider-control/blob/main/frontend/screenshots/slider.png?raw=true)
+
+
+---
+
+
+# create-next-app introduction
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started

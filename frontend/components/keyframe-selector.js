@@ -4,15 +4,15 @@ import useSWR from 'swr';
 const fetcher = (...args) => fetch(...args).then(res => res.json());
 
 export default function SelectorExport () {
-    const {keyframes, err} = useSWR("/api/movement/positions/keyframes", fetcher, { refreshInterval: 1000 })
+    const {data, err} = useSWR("/api/movement/positions/keyframes", fetcher, { refreshInterval: 1000 })
 
     if(err) return <div>Error</div>
-    if(!keyframes) return <div>Loading</div>
+    if(!data) return <div>Loading</div>
 
-    return <KeyframeSelector keframes={keyframes} />
+    return <KeyframeSelector keyframes={data.positions.keyframes} />
 }
 
-function KeyframeSelector ({ keframes }) {
+function KeyframeSelector ({ keyframes }) {
     return(
         <SelectorContainer name={"keyframe-selector"} id={"keyframe-selector"} >
             {keyframes.map((keyframe, index) => {
@@ -24,5 +24,9 @@ function KeyframeSelector ({ keframes }) {
 
 /* STYLES */
 const SelectorContainer = styled.select`
+    width: 140px;
+    height: 50px;
+    margin: 0 20px;
 
+    border-radius: 5px;
 `;

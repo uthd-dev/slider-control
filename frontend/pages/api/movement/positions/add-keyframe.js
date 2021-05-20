@@ -1,6 +1,7 @@
 import axios from "axios";
 
 export default async (req, res) => {
+  console.log(req.body);
   if (req.body) {
     axios
       .post("http://localhost:3001/api/movement/positions/keyframes", { ...req.body })
@@ -12,7 +13,11 @@ export default async (req, res) => {
         console.log(
           "Error: Could not POST backend API: '/api/movement/positions'"
         );
-        res.status(500).end("Internal Server Error");
+        res.status(500).json({
+          error: "INTERNAL_SERVER_ERROR"
+        });
       });
-  }
+  }else res.status(400).json({
+    error: "MALFORMED_REQUEST"
+  });
 };

@@ -10,6 +10,7 @@ import Button from "../components/button";
 import TravelHomeButton from "../components/buttons/home";
 import UnlockMotorsButton from "../components/buttons/unlock";
 import AddKeyframeButton from "../components/buttons/add-keyframe";
+import KeyframeSelector from "../components/keyframe-selector";
 
 export default function Home() {
   return (
@@ -26,6 +27,7 @@ export default function Home() {
       </Row>
       <Row>
         <AddKeyframeButton />
+        <KeyframeSelector />
       </Row>
     </PageContainer>
   );

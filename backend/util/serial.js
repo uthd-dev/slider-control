@@ -8,9 +8,9 @@ let port = new SerialPort(serialPort, { autoOpen: false }, () => {
   console.log(`Serial Port: ${serialPort}`);
 });
 
-exports.serialInit = () => {
+var serialInit = (exports.serialInit = () => {
   return new Promise((resolve, reject) => {
-    port.open((err) => {
+    port.open(err => {
       if (err) {
         reject(err);
       } else {
@@ -20,9 +20,9 @@ exports.serialInit = () => {
       }
     });
   });
-};
+});
 
-var sendCommand = exports.sendCommand = function sendCommand(command) {
+var sendCommand = (exports.sendCommand = function sendCommand(command) {
   port.write(command + "\r", "ascii", function (err) {
     if (err) console.log(err);
 
@@ -32,9 +32,7 @@ var sendCommand = exports.sendCommand = function sendCommand(command) {
       });
     });
   });
-}
-
-
+});
 
 //Moving carriage along the track
 var stepperMoveX = (exports.stepperMoveX = (time, steps) => {
@@ -202,10 +200,39 @@ exports.unlockMotors = () => {
   sendCommand("em,0,0");
 };
 
-port.on("error", (err) => {
+port.on("error", err => {
   console.log(`Serial Communication Error: ${err}`);
+  attemptSerialReConnect(0);
 });
 
 port.on("close", () => {
   console.log(`Serial Port ${port} closed!`);
+  attemptSerialReConnect(0);
 });
+
+let reconnecting = false;
+
+function attemptSerialReConnect(i) {
+  port = new SerialPort(serialPort, { autoOpen: false }, () => {
+    console.log(`Serial Port: ${serialPort}`);
+  });
+
+  serialInit()
+    .then(() => {
+      console.log(`Serial Port reconnection successful!`);
+    })
+    .catch(err => {
+      if (reconnecting == false) {
+        reconnecting = true;
+        console.log(
+          `Could not reconnect to Serial Port! Trying again in ${i} seconds...`
+        );
+        setTimeout(() => {
+          if (i <= 30) {
+            reconnecting = false;
+            attemptSerialReConnect(i + 2);
+          } else process.exit();
+        }, i * 1000);
+      }
+    });
+}

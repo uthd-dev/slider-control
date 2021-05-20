@@ -44,6 +44,12 @@ function handleClick(pos) {
     .post(`${apiBaseUrl}/add-keyframe`, {
       mot1: pos.positions.motorPositions.mot1,
       mot2: pos.positions.motorPositions.mot2,
+    },
+    {
+      headers: {
+        // Overwrite Axios's automatically set Content-Type
+        'Content-Type': 'application/json'
+      }
     })
     .then((res) => {
       buttonElement.style.backgroundColor = "#10B981";

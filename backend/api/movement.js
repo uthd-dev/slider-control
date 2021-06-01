@@ -5,6 +5,71 @@ let validateMove = require("../util/serial/validateMove");
 let stepperMove = require("../util/serial/move");
 let pos = require("../util/pos");
 
+router.get("/tempmove", (req, res) => { //Temp function in place of proper keyframing system
+  if (
+    req.query.pos1mot1 &&
+    req.query.pos1mot2 &&
+    req.query.pos2mot1 &&
+    req.query.pos2mot2 &&
+    req.query.time
+  ) {
+    let pos1 = {
+      mot1: parseInt(req.query.pos1mot1),
+      mot2: parseInt(req.query.pos1mot2),
+    };
+    let pos2 = {
+      mot1: parseInt(req.query.pos2mot1),
+      mot2: parseInt(req.query.pos2mot2),
+    };
+
+    let stepsMot1ToPos1 = pos1.mot1 - pos.motorPositions.mot1;
+    let stepsMot2ToPos1 = pos1.mot2 - pos.motorPositions.mot2;
+
+    let timeToPos1 = Math.max(stepsMot1ToPos1, stepsMot2ToPos1) / 10;
+
+    let stepsMot1ToPos2 = pos2.mot1 - pos1.mot1;
+    let stepsMot2ToPos2 = pos2.mot2 - pos1.mot2;
+
+    let timeToPos2 = parseInt(req.query.time);
+
+    validateMove(stepsMot1ToPos1, stepsMot2ToPos1, timeToPos1).then(() => {
+      stepperMove(pos1, {
+        mot1: stepsMot1ToPos1 / timeToPos1,
+        mot2: stepsMot2ToPos1 / timeToPos1,
+      })
+        .then(() => {
+          validateMove(stepsMot1ToPos2, stepsMot2ToPos2, timeToPos2)
+            .then(() => {
+              stepperMove(pos2, {
+                mot1: stepsMot1ToPos2 / timeToPos2,
+                mot2: stepsMot2ToPos2 / timeToPos2,
+              })
+                .then(() => {
+                  console.log(
+                    `Sending positional response for: /api/movement/tempmove`
+                  );
+                  res.status(200).json({
+                    positions: {
+                      motorPositions: { ...pos.motorPositions },
+                      animationPositions: { ...pos.postitions },
+                    },
+                  });
+                })
+                .catch(err => {
+                  console.log(err);
+                });
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    });
+  }
+});
+
 router.get("/translate", (req, res) => {
   if (req.query.time && req.query.steps) {
     let time = parseInt(req.query.time);
